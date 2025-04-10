@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
@@ -37,12 +38,15 @@ router.post("/", async (req, res) => {
 
   // -if you're building with react you can store these tokens on the local storage.
 
-  // -if you're building on a mobile app you have a similar option like local storage.
+  //   -if you're building on a mobile app you have a similar option like local storage.
 
-  //   head to JWT.io
+  //   -head to JWT.io that as a debugger for working JSON tokens
 
-  // give JSON Web Token (A long string that iditifies a user aka drivers license for your password) to express {send} method
-  res.send(true);
+  // give a [payload]( { _id: user._id } ), and a [privateKey( used to create a private signature )] to jwt {sign} method and store the string in a [token] variable **dont not store secrets in source code**
+  const token = jwt.sign({ _id: user._id }, "jwtPrivateKey");
+
+  //   give JSON Web [token] (A long string that iditifies a user aka drivers license for your password) to express {send} method
+  res.send(token);
 });
 
 function validate(req) {
