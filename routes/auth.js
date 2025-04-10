@@ -33,9 +33,15 @@ router.post("/", async (req, res) => {
   if (!validatePassword)
     return res.status(400).send("Invalid email or password.");
 
-  // if you get to this point then this is a valid login.
+  // -if you get to this point then this is a valid login.
 
-  // give [true] to express {send} method
+  // -if you're building with react you can store these tokens on the local storage.
+
+  // -if you're building on a mobile app you have a similar option like local storage.
+
+  //   head to JWT.io
+
+  // give JSON Web Token (A long string that iditifies a user aka drivers license for your password) to express {send} method
   res.send(true);
 });
 
