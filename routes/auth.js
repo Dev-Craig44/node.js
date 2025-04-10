@@ -1,3 +1,4 @@
+const Joi = require("joi");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
@@ -14,7 +15,7 @@ router.post("/", async (req, res) => {
 
   // ***** Make sure user is not already created*****
 
-  // Look for the email value using the req body and store it in the a user variable
+  // Look for the email value using the [req.body] variable and store it in the a [user] variable
   let user = await User.findOne({ email: req.body.email });
 
   // not sending a 404 because I don't want to tell the client why this shit failed.
@@ -22,13 +23,17 @@ router.post("/", async (req, res) => {
   // check to see if the | user | variable is not there, and if true, give | "Invail Message" | to  express {send} method, and give | 400 | to express { status } method. *DEAD*
   if (!user) return res.status(400).send("Invalid email or password.");
 
-  // give the | req body password | and the | user password | to bcrypt {compare} method. await it and put it in a [validate] variable. This value will be a Boolean
-  const validate = bcrypt.compare(req.body.password, user.password);
+  // give the | req body password | and the | user password | to bcrypt {compare} method. await it and put it in a [validatePassword] variable. This value will be a Boolean
+  const validatePassword = await bcrypt.compare(
+    req.body.password,
+    user.password
+  );
 
-  // check to see if the [validate] variable is not true, and if true, give | "Invail Message" | to  express {send} method, and give | 400 | to express { status } method. *DEAD*
-  if (!validate) return res.status(400).send("Invalid email or password.");
+  // check to see if the [validatePassword] variable is not true, and if true, give | "Invail Message" | to  express {send} method, and give | 400 | to express { status } method. *DEAD*
+  if (!validatePassword)
+    return res.status(400).send("Invalid email or password.");
 
-  // if you get to this point then this is a valide login.
+  // if you get to this point then this is a valid login.
 
   // give [true] to express {send} method
   res.send(true);
