@@ -1,3 +1,4 @@
+const config = require("config");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const _ = require("lodash");
@@ -43,7 +44,7 @@ router.post("/", async (req, res) => {
   //   -head to JWT.io that as a debugger for working JSON tokens
 
   // give a [payload]( { _id: user._id } ), and a [privateKey( used to create a private signature )] to jwt {sign} method and store the string in a [token] variable **dont not store secrets in source code**
-  const token = jwt.sign({ _id: user._id }, "jwtPrivateKey");
+  const token = jwt.sign({ _id: user._id }, config.get("jwtPrivateKey"));
 
   //   give JSON Web [token] (A long string that iditifies a user aka drivers license for your password) to express {send} method
   res.send(token);
