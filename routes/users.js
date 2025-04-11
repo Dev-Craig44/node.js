@@ -34,9 +34,8 @@ router.post("/", async (req, res) => {
   // Save this user using the database's save method and await it. Check if parent function is async.
   await user.save();
 
-  //  create a [token] variable using the jwt sign method and give it a payload ( { _id: user._id } ), and a [privateKey( used to create a private signature )] to jwt {sign} method **dont not store secrets in source code**
-
-  const token = jwt.sign({ _id: user._id }, config.get("jwtPrivateKey"));
+  // put the [user] object {generateAuthToken} method in a [token] variable
+  const token = user.generateAuthToken();
 
   // *** FINALLY***
   // for any custom headers that we define in our application we should prefix this header with 'x-' to avoid any conflicts with the standard headers. This is a convention that is followed in the HTTP protocol. second argument is the value which in this case is our token

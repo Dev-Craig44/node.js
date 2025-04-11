@@ -1,5 +1,3 @@
-const config = require("config");
-const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
@@ -35,20 +33,19 @@ router.post("/", async (req, res) => {
   if (!validatePassword)
     return res.status(400).send("Invalid email or password.");
 
+  // take the {generateAuthToken} method on the [user] object and put it in a [token] variable
+  const token = user.generateAuthToken();
+
   // -if you get to this point then this is a valid login.
-
-  // -if you're building with react you can store these tokens on the local storage.
-
-  //   -if you're building on a mobile app you have a similar option like local storage.
-
-  //   -head to JWT.io that as a debugger for working JSON tokens
-
-  // give a [payload]( { _id: user._id } ), and a [privateKey( used to create a private signature )] to jwt {sign} method and store the string in a [token] variable **dont not store secrets in source code**
-  const token = jwt.sign({ _id: user._id }, config.get("jwtPrivateKey"));
 
   //   give JSON Web [token] (A long string that iditifies a user aka drivers license for your password) to express {send} method
   res.send(token);
 });
+
+// Information Expert Principle
+// an object that is a expert in a given area should be responsible for making decisions and performing tasks.
+
+// because user is an expert in the area of user validation, we should put the validation logic inside the user model.
 
 function validate(req) {
   const schema = {
