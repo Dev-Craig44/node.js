@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+const config = require("config");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
@@ -32,10 +34,17 @@ router.post("/", async (req, res) => {
   // Save this user using the database's save method and await it. Check if parent function is async.
   await user.save();
 
+  //  create a [token] variable using the jwt sign method and give it a payload ( { _id: user._id } ), and a [privateKey( used to create a private signature )] to jwt {sign} method **dont not store secrets in source code**
+
+  const token = jwt.sign({ _id: user._id }, config.get("jwtPrivateKey"));
+
   // *** FINALLY***
-  //
-  // Send the user's name and email to whoever made the request, using express's send method. Make sure you don't sent the password.
-  res.send(_.pick(user, ["id", "name", "email"]));
+  // for any custom headers that we define in our application we should prefix this header with 'x-' to avoid any conflicts with the standard headers. This is a convention that is followed in the HTTP protocol. second argument is the value which in this case is our token
+
+  // give [user] and an array of selectors to the lodash {pick} method and send it to the express {send} method after we give 'x-auth-token' to the express {header} method
+  res
+    .header("x-auth-token", token)
+    .send(_.pick(user, ["_id", "name", "email"]));
 });
 
 module.exports = router;
