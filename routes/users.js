@@ -1,3 +1,7 @@
+// This isn't about authentication, it's about authorization.
+// // Authentication is the process of verifying the identity of a user or system.
+// // Authorization is the process of determining whether a user or system has permission to access a resource or perform an action.
+const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const _ = require("lodash");
@@ -6,6 +10,19 @@ const mongoose = require("mongoose");
 const { User, validate } = require("../models/user");
 const express = require("express");
 const router = express.Router();
+
+// add api endpoint for getting the current user
+// dont use /:id because somebody could send a random id and get a user that is not theirs
+// so instead we will use the /me endpoint, this the client wont send the id, will get it from the token
+router.get("/me", auth, async (req, res) => {
+  // find user by id
+  // give [req.user.id] to the User Model {findById} method and put it in a [user] variable
+  // do not give the password to the user object
+  const user = await User.findById(req.user._id).select("-password");
+
+  // give the [user] variable to the express {send} method
+  res.send(user);
+});
 
 router.post("/", async (req, res) => {
   //Valdate what's inside the body using validation function from the user Model file and destructure it to a error variable
