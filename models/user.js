@@ -23,8 +23,10 @@ const userSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 1021,
   },
+  isAdmin: {
+    type: Boolean,
+  },
 });
-
 // add a method to the userSchema object.
 // create a method called {generateAuthToken} on the userSchema object
 // change function to an arrow function because arrow functions don't have their own this context
@@ -39,8 +41,12 @@ userSchema.methods.generateAuthToken = function () {
 
   //   -head to JWT.io that as a debugger for working JSON tokens
 
+  //add isAdmin property to the userSchema payload ^^
   // give a [payload]( { _id: this._id } ), and a [privateKey( used to create a private signature )] to jwt {sign} method and store the string in a [token] variable **dont not store secrets in source code**
-  const token = jwt.sign({ _id: this._id }, config.get("jwtPrivateKey"));
+  const token = jwt.sign(
+    { _id: this._id, isAdmin: this.isAdmin },
+    config.get("jwtPrivateKey")
+  );
   return token;
 };
 

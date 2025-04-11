@@ -8,7 +8,7 @@ module.exports = function auth(req, res, next) {
   const token = req.header("x-auth-token");
 
   // if [token] not being there is true, give [Access denied] string to the express {send} method after we give [401] to the express {status} method **DEAD**
-  if (!token) return res.status(401).send("Access denied.");
+  if (!token) return res.status(401).send("Access denied. No token provided.");
 
   try {
     // give the [jwtPrivateKey] string to the config {get} method as the second argument and the [token] variable to the jwt {verify} method and put it in a [decoded] variable
