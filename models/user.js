@@ -23,6 +23,9 @@ const userSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 1021,
   },
+  // in the real world, you might have multiple roles for a user
+ // you would need a property called [roles] and that would be an array of strings
+ // in a more advance application, we would have operations which would be an array of complex objects
   isAdmin: {
     type: Boolean,
   },

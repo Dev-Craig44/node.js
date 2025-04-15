@@ -31,3 +31,25 @@ When I split my VS Code terminal:
 export vidly_jwtPrivateKey=MySecureKey
 nodemon index.js
 ```
+
+# 🔐 Authentication & Authorization in Node.js (Vidly API)
+
+## 📚 Summary of Key Concepts
+
+### ✅ Authentication vs Authorization
+
+- **Authentication** = Confirming the user _is who they claim to be_ (e.g., email + password).
+- **Authorization** = Checking if the _authenticated user is allowed_ to perform a specific action.
+
+---
+
+### 🔐 Password Hashing with Bcrypt
+
+```js
+// Hashing passwords
+const salt = await bcrypt.genSalt(10);
+const hashed = await bcrypt.hash("1234", salt);
+
+// Validating passwords
+const isValid = await bcrypt.compare("1234", hashed);
+```
