@@ -1,0 +1,5 @@
+PORT=1111
+vidly_password=1234
+MONGODB_URI=mongodb://localhost/genres
+DEBUG=app:*
+NODE_ENV=development
