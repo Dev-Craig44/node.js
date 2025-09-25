@@ -53,3 +53,12 @@ const hashed = await bcrypt.hash("1234", salt);
 // Validating passwords
 const isValid = await bcrypt.compare("1234", hashed);
 ```
+
+## Handling Errors
+
+- Send a friendly error
+- Log the exception
+
+By default is there is no connection MongoDB will try to reconnect 30 times with 1 second intervals.
+
+With our current implementation if MongoDB shuts down for more than 30secs it will not fire back up.
