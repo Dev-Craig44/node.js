@@ -5,15 +5,11 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
-// 6.) Add next to the params to pass control to the next middleware function
 router.get("/", async (req, res, next) => {
-  // 1.) Create a try/catch block for our async code
   try {
     const genres = await Genre.find().sort("name");
     res.send(genres);
   } catch (error) {
-    // 5.) Move logic for handling reject promises and pass control to our error handling middleware function.
-    // 7.) Call the next() and pass it our [error] object.
     next(error);
   }
 });
@@ -27,7 +23,6 @@ router.get("/:id", async (req, res) => {
   res.send(genre);
 });
 
-// this endpoint should be only accesssible to the admin
 router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
