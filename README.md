@@ -16,6 +16,7 @@ vidly_jwtPrivateKey=YourLocalKey npx nodemon index.js
 ```
 
 Notes:
+
 - Put secrets in `~/.zshrc` or a local `.env` (don't commit `.env`).
 - If projects conflict on port 3000, change the port via env or config.
 
@@ -98,7 +99,6 @@ const isValid = await bcrypt.compare("1234", hashed);
 By default if there is no connection MongoDB will try to reconnect 30 times with 1 second intervals.
 
 With our current implementation if MongoDB shuts down for more than 30secs it will not fire back up.
-
 ````
 
 ### 4.1 - Express / after/public/readme.txt
@@ -124,76 +124,6 @@ This is a readme file! I love this shit!
 ---
 
 If you want this aggregated file to update automatically, I can add a small Node script or npm task that rebuilds this section by scanning the repository.
-# Node.js Course Notes
-
-## 🔐 Environment Variables & Config Setup (Node.js + config package)
-
-### 📚 What I Learned
-
-While building a secure Node.js API with `config` and `jsonwebtoken`, I ran into a critical issue:
-
-> `FATAL ERROR: jwtPrivateKey is not defined`
-
-Even though I used `export` in my terminal and verified the variable was set with `echo`, my app still crashed when running `nodemon index.js`.
-
----
-
-### 🧠 What Was Actually Happening?
-
-#### ✅ `export` works... but only in the terminal it was set
-
-When I split my VS Code terminal:
-
-- Right pane: ran `export vidly_jwtPrivateKey=MySecureKey`
-- Left pane: ran `nodemon index.js`
-
-🛑 **Problem**: Environment variables set in one terminal **don’t carry over** to another. They live only in the shell session where they were created.
-
----
-
-### ✅ What Fixed It
-
-#### Option 1: Run Both Commands in the Same Terminal
-
-```bash
-export vidly_jwtPrivateKey=MySecureKey
-nodemon index.js
-```
-
-## 🔐 Authentication & Authorization in Node.js (Vidly API)
-
-### 📚 Summary of Key Concepts
-
-#### ✅ Authentication vs Authorization
-
-- **Authentication** = Confirming the user _is who they claim to be_ (e.g., email + password).
-- **Authorization** = Checking if the _authenticated user is allowed_ to perform a specific action.
-
----
-
-### 🔐 Password Hashing with Bcrypt
-
-```js
-// Hashing passwords
-const salt = await bcrypt.genSalt(10);
-const hashed = await bcrypt.hash("1234", salt);
-
-// Validating passwords
-const isValid = await bcrypt.compare("1234", hashed);
-```
-
-## Handling Errors
-
-- Send a friendly error
-- Log the exception
-
-By default if there is no connection MongoDB will try to reconnect 30 times with 1 second intervals.
-
-With our current implementation if MongoDB shuts down for more than 30 secs it will not fire back up.
-
-## Express Error Middleware
-
-The problem with our implementation is that if we wanted to change the implementation/error message later, we would have to change it in several different places.
 
 ---
 
@@ -209,20 +139,3 @@ Other READMEs and notes in this repo:
 - [College: public/readme.txt](College/public/readme.txt) — "This is a readme file! I love this shit!"
 
 _I've kept all subfolder README files untouched and linked them above so your future self can find context quickly._
-
-If you want, I can now:
-
-- Auto-scan the repo for other README-like files and include them in this index (titles + snippets).
-- Generate a `SUMMARY.md` or `docs/` folder for a cleaner, navigable course notebook.
-## Handling Errors
-
-- Send a friendly error
-- Log the exception
-
-By default is there is no connection MongoDB will try to reconnect 30 times with 1 second intervals.
-
-With our current implementation if MongoDB shuts down for more than 30secs it will not fire back up.
-
-## Express Error Middleware
-
-The problem w/ our implementation is that if we wanted to change the implementation/error message later, we would have to change it in several different places.
