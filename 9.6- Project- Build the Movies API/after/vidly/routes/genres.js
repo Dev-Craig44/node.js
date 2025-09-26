@@ -6,8 +6,14 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const genres = await Genre.find().sort("name");
-  res.send(genres);
+  // 1.) Create a try/catch block for our async code
+  try {
+    const genres = await Genre.find().sort("name");
+    res.send(genres);
+  } catch (error) {
+    // 2.) Handle a rejected promise here
+    res.status(500).res.send("Something went wrong");
+  }
 });
 
 router.get("/:id", async (req, res) => {
@@ -48,9 +54,6 @@ router.put("/:id", auth, async (req, res) => {
   res.send(genre);
 });
 
-// apply two middleware functions here
-// 1. auth middleware
-// 2. admin middleware
 router.delete("/:id", [auth, admin], async (req, res) => {
   const genre = await Genre.findByIdAndRemove(req.params.id);
 
