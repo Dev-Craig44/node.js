@@ -30,5 +30,11 @@ app.use("/api/movies", movies);
 app.use("/api/users", users);
 app.use("/api/auth", auth);
 
+// 3.) Add middleware function for our error catcher
+app.use(function (next, req, res, next) {
+  // 4.) Add logic for handling errors here
+  res.status(500).res.send("Something went wrong");
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
