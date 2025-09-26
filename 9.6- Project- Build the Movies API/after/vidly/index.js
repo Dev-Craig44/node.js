@@ -1,3 +1,5 @@
+// 9.) Load our error module the we separate
+const error = require("./middleware/error");
 const config = require("config");
 const mongoose = require("mongoose");
 const customers = require("./routes/customers");
@@ -31,10 +33,8 @@ app.use("/api/users", users);
 app.use("/api/auth", auth);
 
 // 3.) Add middleware function for our error catcher
-app.use(function (next, req, res, next) {
-  // 4.) Add logic for handling errors here
-  res.status(500).res.send("Something went wrong");
-});
+// 10.) Pass our import error handling module here
+app.use(error);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
