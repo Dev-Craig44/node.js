@@ -1,3 +1,5 @@
+// 1.) Import our package to help us monkey patch our code.
+require("express-async-errors");
 const error = require("./middleware/error");
 const config = require("config");
 const mongoose = require("mongoose");

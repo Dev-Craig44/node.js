@@ -1,4 +1,4 @@
-module.export = function (handler) {
+module.exports = function (handler) {
   return async (req, res, next) => {
     await handler();
     try {
