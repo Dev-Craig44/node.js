@@ -1,3 +1,5 @@
+// 8.) Import the module we just made
+const asyncMiddleware = require("../middleware/async");
 const admin = require("../middleware/admin");
 const auth = require("../middleware/auth");
 const { Genre, validate } = require("../models/genre");
@@ -5,23 +7,30 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
-router.get("/", async (req, res, next) => {
-  try {
+// 7.) Move logic into module
+
+// 3.) Remove the try/catch block w/ the next param
+// 4.) Wrap the anonymous function in the asyncMiddleware function
+router.get(
+  "/",
+  asyncMiddleware(async (req, res) => {
     const genres = await Genre.find().sort("name");
     res.send(genres);
-  } catch (error) {
-    next(error);
-  }
-});
+  })
+);
 
-router.get("/:id", async (req, res) => {
-  const genre = await Genre.findById(req.params.id);
+// 9.) Wrap route in our asyncMiddleware function
+router.get(
+  "/:id",
+  asyncMiddleware(async (req, res) => {
+    const genre = await Genre.findById(req.params.id);
 
-  if (!genre)
-    return res.status(404).send("The genre with the given ID was not found.");
+    if (!genre)
+      return res.status(404).send("The genre with the given ID was not found.");
 
-  res.send(genre);
-});
+    res.send(genre);
+  })
+);
 
 router.post("/", auth, async (req, res) => {
   const { error } = validate(req.body);
