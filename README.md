@@ -139,3 +139,9 @@ Other READMEs and notes in this repo:
 - [College: public/readme.txt](College/public/readme.txt) — "This is a readme file! I love this shit!"
 
 _I've kept all subfolder README files untouched and linked them above so your future self can find context quickly._
+
+## Express Async Errors
+
+Our try/catch saved us from repetitive try/catch blocks, but we have to remember to call it EVERY TIME.
+
+- Download NPM package `npm i express-async-errors`
