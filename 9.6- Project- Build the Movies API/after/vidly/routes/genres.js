@@ -1,4 +1,3 @@
-// 8.) Import the module we just made
 const asyncMiddleware = require("../middleware/async");
 const admin = require("../middleware/admin");
 const auth = require("../middleware/auth");
@@ -7,10 +6,6 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
-// 7.) Move logic into module
-
-// 3.) Remove the try/catch block w/ the next param
-// 4.) Wrap the anonymous function in the asyncMiddleware function
 router.get(
   "/",
   asyncMiddleware(async (req, res) => {
@@ -19,7 +14,6 @@ router.get(
   })
 );
 
-// 9.) Wrap route in our asyncMiddleware function
 router.get(
   "/:id",
   asyncMiddleware(async (req, res) => {
