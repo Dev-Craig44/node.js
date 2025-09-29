@@ -145,3 +145,7 @@ _I've kept all subfolder README files untouched and linked them above so your fu
 Our try/catch saved us from repetitive try/catch blocks, but we have to remember to call it EVERY TIME.
 
 - Download NPM package `npm i express-async-errors`
+
+## Logging Errors Using Winston
+
+The Windston logger has what we call a `Transport` which is a storage device for our logs
