@@ -149,3 +149,14 @@ Our try/catch saved us from repetitive try/catch blocks, but we have to remember
 ## Logging Errors Using Winston
 
 The Windston logger has what we call a `Transport` which is a storage device for our logs
+
+- Console
+- File
+- HTTP
+
+We can log messages in:
+
+- MongoDB
+- CouchDB
+- Reddis
+- Loggly

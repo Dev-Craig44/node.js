@@ -1,6 +1,4 @@
 require("express-async-errors");
-// 1.) Import Winston
-const winston = require("winston");
 const error = require("./middleware/error");
 const config = require("config");
 const mongoose = require("mongoose");
@@ -11,6 +9,8 @@ const users = require("./routes/users");
 const auth = require("./routes/auth");
 const express = require("express");
 const app = express();
+
+// 1.) Add another module to log on files
 
 if (!config.get("jwtPrivateKey")) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined");

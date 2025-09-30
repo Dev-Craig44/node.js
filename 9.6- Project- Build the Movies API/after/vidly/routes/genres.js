@@ -1,4 +1,3 @@
-// 2.) Remove our asyncMiddleware logic sense we have the npm package now.
 const admin = require("../middleware/admin");
 const auth = require("../middleware/auth");
 const { Genre, validate } = require("../models/genre");
@@ -7,6 +6,8 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
+  // 4.) Simulate an error
+  throw new Error("Could not get the genres.");
   const genres = await Genre.find().sort("name");
   res.send(genres);
 });
