@@ -11,7 +11,7 @@ const express = require("express");
 const app = express();
 
 if (!config.get("jwtPrivateKey")) {
-  logger.error("FATAL ERROR: jwtPrivateKey is not defined");
+  console.log("FATAL ERROR: jwtPrivateKey is not defined");
 
   process.exit(1);
 }
@@ -21,8 +21,7 @@ const mongoUri = process.env.MONGO_URI || "mongodb://localhost/vidly";
 mongoose
   .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to MongoDB..."))
-  .then(() => console.log("Connected to MongoDB..."))
-  .catch((err) => console.error("Could not connect to MongoDB..."));
+  .catch(() => console.error("Could not connect to MongoDB..."));
 
 app.use(express.json());
 app.use("/api/genres", genres);
