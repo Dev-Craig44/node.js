@@ -160,3 +160,50 @@ We can log messages in:
 - CouchDB
 - Reddis
 - Loggly
+
+---
+
+## UPGRADE_NOTES — logging & dependency upgrades
+
+This section documents a step-by-step upgrade performed on the `9.6 - Project: Build the Movies API (vidly)` project. Use this as a reference for what changed and why.
+
+Summary of what we did
+- Upgraded `winston` to v3 and switched the project to use `createLogger`.
+- Upgraded `winston-mongodb` to v7 and attached the transport after Mongoose connects so logs use the same DB.
+- Upgraded `mongoose` to v7 to align with modern MongoDB drivers and removed deprecated connection options.
+- Upgraded `joi` to v17 and migrated validation code to the `schema.validate(value)` API.
+
+Important commits (on branch `upgrade/logging-stack`)
+- Baseline snapshot before upgrades: 7eef455
+- Move to winston v3 and switch error middleware: d556992
+- Install winston v3 (package update): f5f5be1
+- Install winston-mongodb v7 (package update): 7ef6da6
+- Attach winston-mongodb transport after mongoose connect: 4f851a4
+- Upgrade mongoose to v7 (package update): 3e1b23d
+- Remove deprecated connect options & transport cleanup: 1077136
+- Upgrade Joi to v17 and update validations: 0e05d21
+
+Commands used (examples)
+- Install a specific package version:
+```bash
+cd "9.6- Project- Build the Movies API/after/vidly"
+npm install winston@^3.18.3
+npm install winston-mongodb@^7.0.1
+npm install mongoose@^7.8.7
+npm install joi@^17.13.3
+```
+
+- Start the app for smoke tests (development only):
+```bash
+PORT=3000 vidly_jwtPrivateKey=test node index.js
+```
+
+Verification performed
+- Confirmed server starts and connects to MongoDB.
+- Confirmed `MongoDB transport attached to logger ✅` printed at startup.
+- Triggered `/api/genres` (intentional error) and verified the error document was inserted into `vidly.logs` (visible in Compass or via `mongosh`).
+
+Notes & follow-ups
+- There were a few deprecation warnings from older code paths during the process; they were resolved by upgrading the relevant packages (notably mongoose).
+- Keep commits small and focused — this branch preserves the history of each step so you can review the changes later.
+- Next recommended steps: run linting, add tests, and optionally upgrade remaining minor dependencies one-by-one.

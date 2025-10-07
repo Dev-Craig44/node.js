@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema({
     maxlength: 1021,
   },
   // in the real world, you might have multiple roles for a user
- // you would need a property called [roles] and that would be an array of strings
- // in a more advance application, we would have operations which would be an array of complex objects
+  // you would need a property called [roles] and that would be an array of strings
+  // in a more advance application, we would have operations which would be an array of complex objects
   isAdmin: {
     type: Boolean,
   },
@@ -56,13 +56,14 @@ userSchema.methods.generateAuthToken = function () {
 const User = mongoose.model("User", userSchema);
 
 function validateUser(user) {
-  const schema = {
+  // 1.) Joi v17 schema object and validate using schema.validate().
+  const schema = Joi.object({
     name: Joi.string().min(5).max(50).required(),
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string().min(5).max(255).required(),
-  };
+  });
 
-  return Joi.validate(user, schema);
+  return schema.validate(user);
 }
 
 exports.User = User;

@@ -48,12 +48,13 @@ router.post("/", async (req, res) => {
 // because user is an expert in the area of user validation, we should put the validation logic inside the user model.
 
 function validate(req) {
-  const schema = {
+  // 1.) Joi v17 schema object and validate via schema.validate()
+  const schema = Joi.object({
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string().min(5).max(255).required(),
-  };
+  });
 
-  return Joi.validate(req, schema);
+  return schema.validate(req);
 }
 
 module.exports = router;
