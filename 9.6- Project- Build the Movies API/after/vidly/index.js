@@ -34,8 +34,10 @@ if (!config.get("jwtPrivateKey")) {
 
 const mongoUri = process.env.MONGO_URI || "mongodb://localhost/vidly";
 
+// 3.) Mongoose v7 uses modern MongoDB driver defaults; remove deprecated
+//     connection options (useNewUrlParser, useUnifiedTopology).
 mongoose
-  .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoUri)
   .then(() => {
     console.log("Connected to MongoDB...");
     // 2.) Attach the winston-mongodb transport after successful connect.
@@ -48,7 +50,6 @@ mongoose
           collection: "logs",
           level: "info",
           tryReconnect: true,
-          options: { useUnifiedTopology: true },
         })
       );
       console.log("MongoDB transport attached to logger ✅");
