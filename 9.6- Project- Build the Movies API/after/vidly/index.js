@@ -20,6 +20,14 @@ const auth = require("./routes/auth");
 const express = require("express");
 const app = express();
 
+// 1.) use the built-in Node.js event emitter to handle uncaught exceptions, and use the second argument to log the exception message and stack trace.
+process.on("uncaughtException", (ex) => {
+  // 2.) console.log the exception message and stack trace.
+  console.log("WE GOT AN UNCAUGHT EXCEPTION");
+  // 3.) Use Winston to log the exception message and stack trace.
+  logger.error(ex.message, ex);
+});
+
 if (!config.get("jwtPrivateKey")) {
   console.log("FATAL ERROR: jwtPrivateKey is not defined");
 

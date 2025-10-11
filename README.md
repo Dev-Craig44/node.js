@@ -216,3 +216,24 @@ Notes & follow-ups
 - Next recommended steps: run linting, add tests, and optionally upgrade remaining minor dependencies one-by-one.
 
 ## How to handle uncaught exceptions
+
+To handle uncaught exceptions in Node.js, use the following pattern at the very top of your entry file (`index.js`):
+
+```js
+process.on("uncaughtException", (ex) => {
+  // Log the exception using Winston or another logger
+  winston.error(ex.message, ex);
+  process.exit(1); // Optional: exit the process
+});
+```
+
+For unhandled promise rejections:
+
+```js
+process.on("unhandledRejection", (ex) => {
+  winston.error(ex.message, ex);
+  process.exit(1);
+});
+```
+
+We added these handlers while upgrading the logging stack, ensuring all unexpected errors are logged and the app exits cleanly. This complements the new Winston setup and keeps error tracking robust.
