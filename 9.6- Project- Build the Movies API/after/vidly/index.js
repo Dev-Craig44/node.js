@@ -1,8 +1,5 @@
 require("express-async-errors");
 
-// Development convenience: if the vidly_jwtPrivateKey env var is not set,
-// provide a temporary, non-production key so the app can start locally
-// without exiting. In production we still require a real key.
 if (!process.env.vidly_jwtPrivateKey && process.env.NODE_ENV !== "production") {
   process.env.vidly_jwtPrivateKey = "dev_jwtPrivateKey";
   console.warn(
@@ -13,9 +10,6 @@ if (!process.env.vidly_jwtPrivateKey && process.env.NODE_ENV !== "production") {
 const error = require("./middleware/error");
 const config = require("config");
 const mongoose = require("mongoose");
-// 1.) Require the centralized logger and the winston-mongodb transport.
-//     We'll attach the Mongo transport after the mongoose connection
-//     succeeds so it uses the same DB URI/connection.
 const logger = require("./logging");
 const { MongoDB } = require("winston-mongodb");
 const customers = require("./routes/customers");
@@ -34,18 +28,13 @@ if (!config.get("jwtPrivateKey")) {
 
 const mongoUri = process.env.MONGO_URI || "mongodb://localhost/vidly";
 
-// 3.) Mongoose v7 uses modern MongoDB driver defaults; remove deprecated
-//     connection options (useNewUrlParser, useUnifiedTopology).
 mongoose
   .connect(mongoUri)
   .then(() => {
     console.log("Connected to MongoDB...");
-    // 2.) Attach the winston-mongodb transport after successful connect.
-    //     Use the same mongoUri so logs go to the vidly DB (collection 'logs').
     try {
       logger.add(
         new MongoDB({
-          // 2.1) Provide the connection string (driver will create its own client)
           db: mongoUri,
           collection: "logs",
           level: "error",
@@ -61,6 +50,8 @@ mongoose
     }
   })
   .catch(() => console.error("Could not connect to MongoDB..."));
+
+throw new Error("Something failed during startup.");
 
 app.use(express.json());
 app.use("/api/genres", genres);
