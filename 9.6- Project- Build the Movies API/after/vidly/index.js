@@ -48,7 +48,7 @@ mongoose
           // 2.1) Provide the connection string (driver will create its own client)
           db: mongoUri,
           collection: "logs",
-          level: "info",
+          level: "error",
           tryReconnect: true,
         })
       );
