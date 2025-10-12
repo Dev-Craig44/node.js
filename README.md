@@ -304,3 +304,7 @@ process.on("unhandledRejection", (ex) => {
   process.exit(1);
 });
 ```
+
+When your dealing with either, afterwards you should terminate the node process. Because at this point your app can be in a unclean state.
+
+So best practice is to terminate and restart the process.

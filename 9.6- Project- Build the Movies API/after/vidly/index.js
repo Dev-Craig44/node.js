@@ -22,17 +22,20 @@ const app = express();
 
 // 1.) use the built-in Node.js event emitter to handle uncaught exceptions, and use the second argument to log the exception message and stack trace.
 process.on("uncaughtException", (ex) => {
-  // 2.) console.log the exception message and stack trace.
-  console.log("WE GOT AN UNCAUGHT EXCEPTION");
-  // 3.) Use Winston to log the exception message and stack trace.
-  logger.error(ex.message, ex);
+  // (1) Use Winston to record uncaught exceptions. We avoid console.* here
+  // so the runtime doesn't print duplicate messages when the app is
+  // supervised by a process manager that captures stdout/stderr.
+  logger.error("uncaughtException", ex);
+  // (2) Exit to avoid inconsistent state after an uncaught exception.
+  process.exit(1);
 });
-// 4.) duplicate the uncaughtException handler for unhandledRejections
-process.on("unhandledRejection", (ex) => {
-  // 2.) console.log the exception message and stack trace.
-  console.log("WE GOT AN UNHANDLED REJECTION");
-  // 3.) Use Winston to log the exception message and stack trace.
-  logger.error(ex.message, ex);
+
+process.on("unhandledRejection", (reason, promise) => {
+  // (1) Record the rejection via Winston. Avoid console.* to keep logs
+  // centralized in the configured transports (files / MongoDB).
+  logger.error("unhandledRejection", { reason, promise });
+  // (2) Exit process after logging.
+  process.exit(1);
 });
 
 if (!config.get("jwtPrivateKey")) {
