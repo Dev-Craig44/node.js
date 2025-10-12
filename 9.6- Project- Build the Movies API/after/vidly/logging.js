@@ -26,8 +26,21 @@ const logger = createLogger({
     // 4.) File transport for all combined logs.
     new transports.File({ filename: "combined.log" }),
   ],
-  // 5.) Don't exit on handled exceptions — let express handle process lifecycle.
-  exitOnError: false,
+  // 5.) When relying on Winston's exception/rejection handlers we enable
+  //     exitOnError so the process terminates after a fatal exception. This
+  //     keeps behavior consistent with our previous explicit process.exit(1)
+  //     and avoids leaving the app in an undefined state.
+  //     (Comment 2) Winston will call the configured handlers before exiting.
+  exitOnError: true,
+  // 6.) Have Winston handle uncaught exceptions and unhandled rejections.
+  //     (User requested file name: `uncaughtExeptions` — we respect the
+  //     exact spelling and append a .log extension.)
+  exceptionHandlers: [
+    new transports.File({ filename: "uncaughtExeptions.log" }),
+  ],
+  rejectionHandlers: [
+    new transports.File({ filename: "unhandledRejections.log" }),
+  ],
 });
 
 // 6.) Export the configured logger for use across the app.

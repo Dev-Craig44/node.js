@@ -20,23 +20,13 @@ const auth = require("./routes/auth");
 const express = require("express");
 const app = express();
 
-// 1.) use the built-in Node.js event emitter to handle uncaught exceptions, and use the second argument to log the exception message and stack trace.
-process.on("uncaughtException", (ex) => {
-  // (1) Use Winston to record uncaught exceptions. We avoid console.* here
-  // so the runtime doesn't print duplicate messages when the app is
-  // supervised by a process manager that captures stdout/stderr.
-  logger.error("uncaughtException", ex);
-  // (2) Exit to avoid inconsistent state after an uncaught exception.
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  // (1) Record the rejection via Winston. Avoid console.* to keep logs
-  // centralized in the configured transports (files / MongoDB).
-  logger.error("unhandledRejection", { reason, promise });
-  // (2) Exit process after logging.
-  process.exit(1);
-});
+// (1) We now rely on Winston's `exceptionHandlers` and `rejectionHandlers`
+//     (configured in `logging.js`) to capture uncaught exceptions and
+//     unhandled promise rejections. Those handlers write to dedicated files
+//     (`uncaughtExeptions.log` and `unhandledRejections.log`) and, because
+//     `exitOnError: true` is set, the process will terminate after a fatal
+//     error. This keeps logging centralized and removes duplicate console
+//     output during crashes.
 
 if (!config.get("jwtPrivateKey")) {
   console.log("FATAL ERROR: jwtPrivateKey is not defined");
