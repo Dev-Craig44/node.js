@@ -291,3 +291,16 @@ process.on("unhandledRejection", (ex) => {
 ```
 
 We added these handlers while upgrading the logging stack, ensuring all unexpected errors are logged and the app exits cleanly. This complements the new Winston setup and keeps error tracking robust.
+
+## Unhandled Promise Rejection
+
+The method we used to catch uncaught exception w/ the process.on method only works with synchronous code. So if we have a promise somewhere that gets rejected, the process.on method will not catch it.
+
+Just like uncaught exceptions, we can also listen for unhandled promise rejections:
+
+```js
+process.on("unhandledRejection", (ex) => {
+  winston.error(ex.message, ex);
+  process.exit(1);
+});
+```

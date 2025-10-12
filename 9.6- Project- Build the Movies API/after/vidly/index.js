@@ -27,6 +27,13 @@ process.on("uncaughtException", (ex) => {
   // 3.) Use Winston to log the exception message and stack trace.
   logger.error(ex.message, ex);
 });
+// 4.) duplicate the uncaughtException handler for unhandledRejections
+process.on("unhandledRejection", (ex) => {
+  // 2.) console.log the exception message and stack trace.
+  console.log("WE GOT AN UNHANDLED REJECTION");
+  // 3.) Use Winston to log the exception message and stack trace.
+  logger.error(ex.message, ex);
+});
 
 if (!config.get("jwtPrivateKey")) {
   console.log("FATAL ERROR: jwtPrivateKey is not defined");
@@ -41,14 +48,40 @@ mongoose
   .then(() => {
     console.log("Connected to MongoDB...");
     try {
-      logger.add(
-        new MongoDB({
-          db: mongoUri,
-          collection: "logs",
-          level: "error",
-          tryReconnect: true,
-        })
-      );
+      // (Comment 2) Prefer attaching the MongoDB transport using a *connected*
+      // client so the transport can enqueue operations against the live
+      // DB. Mongoose's connection exposes the underlying client in different
+      // properties depending on version, so try multiple ways.
+      // 1) If mongoose exposes getClient(), use it to obtain a connected
+      //    MongoClient (modern mongoose).
+      // 2) Otherwise, try the legacy `mongoose.connection.client`.
+      // 3) As a fallback, pass the original URI string — the transport will
+      //    create its own connection.
+      let mongoTransportOpts = {
+        collection: "logs",
+        level: "error",
+        tryReconnect: true,
+      };
+
+      // Attempt 1: connected client -> pass a db object
+      const mongooseClient =
+        mongoose.connection &&
+        typeof mongoose.connection.getClient === "function"
+          ? mongoose.connection.getClient()
+          : (mongoose.connection && mongoose.connection.client) || null;
+
+      if (mongooseClient) {
+        // If we have a MongoClient, pass the connected DB object so the
+        // transport doesn't need to create a new connection.
+        mongoTransportOpts.db = mongooseClient.db
+          ? mongooseClient.db()
+          : mongooseClient;
+      } else {
+        // Fallback: give the transport the URI string to let it connect.
+        mongoTransportOpts.db = mongoUri;
+      }
+
+      logger.add(new MongoDB(mongoTransportOpts));
       console.log("MongoDB transport attached to logger ✅");
     } catch (ex) {
       console.error(
@@ -59,7 +92,11 @@ mongoose
   })
   .catch(() => console.error("Could not connect to MongoDB..."));
 
-throw new Error("Something failed during startup.");
+// 1.) Replace this error with a rejected promise
+const p = Promise.reject(new Error("Something failed miserably!"));
+
+// 2.) call the promise, but don't use a catch handler so we'll have a unhandled rejection
+p.then(() => console.log("Done"));
 
 app.use(express.json());
 app.use("/api/genres", genres);
