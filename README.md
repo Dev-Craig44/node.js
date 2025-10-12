@@ -215,6 +215,60 @@ Notes & follow-ups
 - Keep commits small and focused — this branch preserves the history of each step so you can review the changes later.
 - Next recommended steps: run linting, add tests, and optionally upgrade remaining minor dependencies one-by-one.
 
+---
+
+## Node.js / MongoDB upgrade notes (local environment)
+
+Short summary of what I did while upgrading MongoDB locally for the Vidly project:
+
+- Backup: created a logical dump of the `vidly` database with `mongodump` and saved it to:
+  - `~/backups/vidly-2025-10-11-1949`
+- Staged upgrade: the system data was originally on MongoDB 6.0. I installed `mongodb-community@7.0` and started it, then advanced the cluster Feature Compatibility Version (FCV) to `7.0` using:
+  - `mongosh --eval "db.getSiblingDB('admin').runCommand({setFeatureCompatibilityVersion: '7.0', confirm: true})"`
+- 8.x trial: Homebrew had `mongodb-community` 8.2.1 installed and `/opt/homebrew/bin/mongod` pointed at 8.2.1, but attempting to start 8.x against the existing data directory failed because the admin FCV was still `7.0`. MongoDB 8.x refuses to run when the data's FCV is not in the 8.x family (this is expected and safeguards data).
+- Decision: to avoid disruption, I kept the system service running on MongoDB 7.x for this machine. The application and logging stack were validated against the running 7.0 instance.
+
+Quick reproduction / rollback commands (safe, conservative)
+
+1. Create a logical backup of the vidly DB (already done):
+
+```bash
+BACKUP_DIR=~/backups/vidly-$(date +%F-%H%M)
+mongodump --db=vidly --out="$BACKUP_DIR"
+```
+
+2. If you want to try 8.x without touching the system service, run an isolated 8.x mongod on a different port/dbpath and restore the dump there:
+
+```bash
+# start an 8.x mongod on port 27018 with a fresh dbpath
+mkdir -p ~/mongodb-test-8x-db
+/opt/homebrew/Cellar/mongodb-community/8.2.1/bin/mongod --dbpath ~/mongodb-test-8x-db --port 27018 --bind_ip 127.0.0.1 --logpath ~/mongodb-test-8x-db/mongod.log --logappend &
+
+# restore vidly into the test server
+mongorestore --port 27018 --nsInclude="vidly.*" ~/backups/vidly-2025-10-11-1949/vidly
+
+# smoke test
+mongosh --port 27018 --quiet --eval "db.getSiblingDB('vidly').test.insertOne({smoke: true, time: new Date()}); print('count:', db.getSiblingDB('vidly').test.countDocuments())"
+```
+
+3. If you later decide to switch the system service to 8.x (ONLY after a successful restore/test and with a backup), stop the 7.x service, move the data directory aside, start the generic Homebrew `mongodb-community` service (8.x), and then set FCV to `8.0`:
+
+```bash
+brew services stop mongodb-community@7.0
+TIMESTAMP=$(date +%F-%H%M)
+mv /opt/homebrew/var/mongodb /opt/homebrew/var/mongodb.bak-$TIMESTAMP
+brew services start mongodb-community
+
+# verify server is 8.x then set FCV
+mongosh --quiet --eval "print('server', db.version())"
+mongosh --quiet --eval "db.getSiblingDB('admin').runCommand({setFeatureCompatibilityVersion: '8.0', confirm: true})"
+```
+
+Notes:
+
+- The logical backup is stored in `~/backups/vidly-2025-10-11-1949` (keep it safe).
+- I validated the Node app and logging on the running 7.0 instance and left the service on 7.x so other local projects won't be disrupted.
+
 ## How to handle uncaught exceptions
 
 To handle uncaught exceptions in Node.js, use the following pattern at the very top of your entry file (`index.js`):
