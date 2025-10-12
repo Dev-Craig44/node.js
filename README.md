@@ -214,6 +214,7 @@ Notes & follow-ups
 - There were a few deprecation warnings from older code paths during the process; they were resolved by upgrading the relevant packages (notably mongoose).
 - Keep commits small and focused — this branch preserves the history of each step so you can review the changes later.
 - Next recommended steps: run linting, add tests, and optionally upgrade remaining minor dependencies one-by-one.
+- Next recommended steps: run linting, add tests, and optionally upgrade remaining minor dependencies one-by-one.
 
 ---
 
@@ -305,6 +306,25 @@ process.on("unhandledRejection", (ex) => {
 });
 ```
 
-When your dealing with either, afterwards you should terminate the node process. Because at this point your app can be in a unclean state.
+When handling uncaught exceptions or unhandled promise rejections, you should terminate the Node process after logging the error. This is important because the application may be left in an inconsistent or unstable state.
 
-So best practice is to terminate and restart the process.
+**Best practice:** Exit the process and rely on a process manager (like PM2 or Docker) to automatically restart your app.
+
+### ⚠️ About Winston `exceptionHandlers` and logfile naming
+
+When using Winston's `exceptionHandlers` and `rejectionHandlers` to capture
+uncaught exceptions and unhandled promise rejections, pick a dedicated filename
+for those handlers that is different from your regular runtime logfile (for
+example, `uncaughtExeptions.log` vs `logfile.log`). Reasons:
+
+- Isolation: crash/exception files capture stack traces and crash context and are
+  easier to scan separately from routine application logs.
+- Avoid locking/rotation conflicts: some log rotation tools or OS-level file
+  locking can behave differently for files written during a crash; a separate
+  file avoids unexpected truncation or rotation interactions.
+- Reliability: if the main logger transport (e.g., MongoDB) fails early during
+  startup, the exception-handler file will still receive the crash record.
+
+We register dedicated Winston exception/rejection handlers that write to
+`uncaughtExeptions.log` and `unhandledRejections.log` so crash data is preserved
+and easily distinguishable from normal logs.
