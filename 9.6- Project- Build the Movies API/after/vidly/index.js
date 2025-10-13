@@ -6,19 +6,17 @@ if (!process.env.vidly_jwtPrivateKey && process.env.NODE_ENV !== "production") {
     "WARNING: vidly_jwtPrivateKey not set — using temporary development key. Do NOT use in production."
   );
 }
-
-const error = require("./middleware/error");
+//  8.) Grab our error middleware because it is not referenced anywhere else
 const config = require("config");
 const mongoose = require("mongoose");
 const logger = require("./logging");
 const { MongoDB } = require("winston-mongodb");
-const customers = require("./routes/customers");
-const genres = require("./routes/genres");
-const movies = require("./routes/movies");
-const users = require("./routes/users");
-const auth = require("./routes/auth");
+// 5.) All of these should be moved to our new module because they have not been referenced anywhere else
+
 const express = require("express");
 const app = express();
+// 4.) Load up our new module which returns a function to initialize
+require("./startup/routes")(app);
 
 // (1) We now rely on Winston's `exceptionHandlers` and `rejectionHandlers`
 //     (configured in `logging.js`) to capture uncaught exceptions and
@@ -91,12 +89,7 @@ const p = Promise.reject(new Error("Something failed miserably!"));
 // 2.) call the promise, but don't use a catch handler so we'll have a unhandled rejection
 p.then(() => console.log("Done"));
 
-app.use(express.json());
-app.use("/api/genres", genres);
-app.use("/api/customers", customers);
-app.use("/api/movies", movies);
-app.use("/api/users", users);
-app.use("/api/auth", auth);
+// cut this part and put it in startup/routes.js
 
 app.use(error);
 const port = process.env.PORT || 3000;
