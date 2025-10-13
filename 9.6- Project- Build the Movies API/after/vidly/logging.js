@@ -36,7 +36,7 @@ const logger = createLogger({
   //     (User requested file name: `uncaughtExeptions` — we respect the
   //     exact spelling and append a .log extension.)
   exceptionHandlers: [
-    new transports.File({ filename: "uncaughtExeptions.log" }),
+    new transports.File({ filename: "uncaughtExceptions.log" }),
   ],
   rejectionHandlers: [
     new transports.File({ filename: "unhandledRejections.log" }),

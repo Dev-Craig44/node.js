@@ -328,3 +328,8 @@ example, `uncaughtExeptions.log` vs `logfile.log`). Reasons:
 We register dedicated Winston exception/rejection handlers that write to
 `uncaughtExeptions.log` and `unhandledRejections.log` so crash data is preserved
 and easily distinguishable from normal logs.
+
+## Extracting Routes
+
+- The problem we have now is that is the lack of separation of concerns. All our routes are in the index.js file. As our application grows, this file will become very big and unmanageable.
+- In our index.js file, we should only orchestrate the different parts of our application. We should not have any business logic in this file.
