@@ -333,3 +333,9 @@ and easily distinguishable from normal logs.
 
 - The problem we have now is that is the lack of separation of concerns. All our routes are in the index.js file. As our application grows, this file will become very big and unmanageable.
 - In our index.js file, we should only orchestrate the different parts of our application. We should not have any business logic in this file.
+
+## Extracting DB Logic
+
+- We can create a folder called `models` and create a file for each model. For example, we can create a file called `genre.js` for the genre model.
+- In this file, we can define the schema and the model. We can also define the validation logic.
+- We can then export the model and the validation function.
