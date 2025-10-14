@@ -1,15 +1,11 @@
-// 4.) Import the required modules
 const mongoose = require("mongoose");
-// 5.) Make sure that you change the path to your logging module.
 const logger = require("../logging");
 const { MongoDB } = require("winston-mongodb");
-// 1.) Export a function
+
 module.exports = function () {
-  // 2.) Paste the DB logic here
   const mongoUri = process.env.MONGO_URI || "mongodb://localhost/vidly";
 
   mongoose.connect(mongoUri).then(() => {
-    // 3.) Replace console.log with logger.info to use Winston logger
     logger.info("Connected to MongoDB...");
     try {
       const mongoTransportOpts = {
@@ -39,5 +35,4 @@ module.exports = function () {
       );
     }
   });
-  // 6.) Because we are not logging this let remove this console.error
 };

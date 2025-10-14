@@ -5,7 +5,6 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  // 5.) Throw an error to test the logging
   throw new Error("Could not get the genres.");
 
   const genres = await Genre.find().sort("name");
