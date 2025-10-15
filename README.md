@@ -341,3 +341,158 @@ and easily distinguishable from normal logs.
 - We can then export the model and the validation function.
 
 ## Extracting The Logging Logic
+
+# 🧱 Handling and Logging Errors
+
+In this section, you learned how to make your Node.js applications more **resilient**, **fault-tolerant**, and **maintainable** by handling and logging unexpected errors properly.
+
+---
+
+## 💡 Key Takeaways
+
+### 🧩 Why Error Handling Matters
+
+- Applications **don’t run in an ideal world** — unexpected errors happen due to:
+  - Bugs in your code 🪲
+  - Failures in external systems (e.g., MongoDB server going down, remote HTTP service unavailable)
+- As a good developer, you must **anticipate these errors**, **log them**, and **return a proper response** to the client instead of letting the app crash.
+
+---
+
+## ⚙️ Express Error Middleware
+
+- Use **Express error-handling middleware** to catch any unhandled exceptions in the **request-processing pipeline**.
+
+Example:
+
+```js
+app.use(function (err, req, res, next) {
+  // Log the exception and return a friendly error to the client
+  res.status(500).send("Something failed");
+});
+```
+
+- Always register this **after all other routes**:
+
+```js
+app.use("/api/genres", genres);
+app.use(error); // Must come last
+```
+
+---
+
+## 🧠 Forwarding Errors to Middleware
+
+To pass control to the error middleware, wrap route logic in a **try/catch block** and call `next()`:
+
+```js
+router.get("/", async (req, res, next) => {
+  try {
+    const genres = await Genre.find();
+    res.send(genres);
+  } catch (ex) {
+    next(ex);
+  }
+});
+```
+
+---
+
+## ⚡ Simplifying with `express-async-errors`
+
+- Adding try/catch blocks in every route is repetitive and error-prone.
+- The `express-async-errors` package **monkey-patches** your route handlers at runtime — it automatically wraps them in try/catch and forwards errors to your middleware.
+
+Install and enable:
+
+```bash
+npm i express-async-errors
+```
+
+Then at the top of your app:
+
+```js
+require("express-async-errors");
+```
+
+No more manual try/catch — just throw errors normally, and Express will catch them.
+
+---
+
+## 🪵 Logging Errors with Winston
+
+- Use **Winston** for professional-grade error logging.
+- Winston can log to multiple **transports** — destinations where logs are stored.
+
+**Core transports:**
+
+- `Console` – outputs to terminal
+- `File` – writes to a log file
+- `Http` – sends logs to a remote server
+
+**Third-party transports:**
+
+- MongoDB, CouchDB, Redis, Loggly, and more.
+
+Example:
+
+```js
+const winston = require("winston");
+winston.add(new winston.transports.File({ filename: "logfile.log" }));
+```
+
+In your error middleware:
+
+```js
+module.exports = function (err, req, res, next) {
+  winston.error(err.message, { metadata: err });
+  res.status(500).send("Something went wrong");
+};
+```
+
+---
+
+## 🚨 Handling Startup Errors
+
+- Express middleware only catches errors **during request processing**.
+- Errors that occur **during startup** (e.g., MongoDB connection failure) are **outside Express’s scope**.
+
+Use **process event handlers** to catch them:
+
+```js
+process.on("uncaughtException", (ex) => {
+  winston.error(ex.message, ex);
+  process.exit(1); // Exit cleanly
+});
+process.on("unhandledRejection", (ex) => {
+  winston.error(ex.message, ex);
+  process.exit(1);
+});
+```
+
+---
+
+## 🧯 Best Practices
+
+- **Always log errors** — never ignore them.
+- **Exit the process** after uncaught exceptions to avoid running in an unclean state.
+- **Use a process manager** (like PM2 or Forever) to automatically restart the app after a crash.
+- Keep log files separate for **info** and **errors** to simplify debugging in production.
+
+---
+
+## 🧾 Summary
+
+| Concept                 | Purpose                                           |
+| :---------------------- | :------------------------------------------------ |
+| `express-async-errors`  | Automatically catch async route errors            |
+| Error Middleware        | Central place to handle errors and send responses |
+| Winston                 | Logging library for storing and managing logs     |
+| Transports              | Where logs are stored (Console, File, HTTP, etc.) |
+| `process.on()` Handlers | Capture uncaught exceptions and rejected promises |
+| Process Restart         | Keeps your app stable after unexpected crashes    |
+
+---
+
+> **In short:**  
+> Handle every error gracefully, log it reliably, and keep your app running smoothly — no surprises, no silent failures. 🚀
