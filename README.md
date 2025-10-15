@@ -339,3 +339,5 @@ and easily distinguishable from normal logs.
 - We can create a folder called `models` and create a file for each model. For example, we can create a file called `genre.js` for the genre model.
 - In this file, we can define the schema and the model. We can also define the validation logic.
 - We can then export the model and the validation function.
+
+## Extracting The Logging Logic
