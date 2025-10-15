@@ -24,7 +24,6 @@ const Customer = mongoose.model(
 );
 
 function validateCustomer(customer) {
-  // 1.) Build a Joi v17 schema object and validate with schema.validate()
   const schema = Joi.object({
     name: Joi.string().min(5).max(50).required(),
     phone: Joi.string().min(5).max(50).required(),
